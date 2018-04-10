@@ -111,7 +111,7 @@ class RobertsonHDR():
         
             diff = abs(old_value - current_value)
             if num>0 and diff < self.THRESHOLD:
-                print()
+                #print()
                 print('converge, round = %d/%d, diff=%f' % (num+1, self.MAXITER, diff))
                 break
             else:
