@@ -1,13 +1,14 @@
 import numpy as np
 import math
 class RobertsonHDR():
-    def __init__(self):
-        self.MAXITER = 10
+    def __init__(self, path):
+        self.MAXITER = 5
         self.THRESHOLD = 0.0001
         self.res_curve = np.zeros([3, 256], dtype='float32')
         
         # init for weight function
         self.w = [math.exp(-4 * (y - 127.5)**2 / (127.5)**2) for y in range(256)]
+        self.path = path
          
     def process(self, images, exp_time):
         self.images = images
@@ -17,6 +18,8 @@ class RobertsonHDR():
         self.res_curve[1,:] = self.find_res_curve(1)
         self.res_curve[2,:] = self.find_res_curve(2)
         
+        with open(self.path +'CRF.dat', 'wb') as f:
+            self.res_curve.dump(f)
 #         self.normalizeCurve()
         
         # recover HDR
