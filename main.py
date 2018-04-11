@@ -33,8 +33,26 @@ def readfromfile(path, filename, scale):
 if __name__ == '__main__':
 
 
+	algo = 'Paul'
+	imSet = 1
+	tempScale = 1.0
+	if len(sys.argv) > 1: 
+		if sys.argv[1] == 'Robertson' :
+			algo = 'Robertson'
+		else :
+			algo = 'Paul'
+	if len(sys.argv) > 2: 
+		if int(sys.argv[2]) <= 3 and  int(sys.argv[2]) > 0:
+			imSet = int(sys.argv[2])
+		else :
+			imset = 1
 
-	images, exp_times = readfromfile('test/', 'test/memorial.hdr_image_list.txt', 1)
+	if len(sys.argv) > 3: 
+		tempScale = float(sys.argv[3])
+
+	#print(imSet)
+
+	images, exp_times = readfromfile('test'+str(imSet)+'/', 'test'+str(imSet)+'/input.txt', tempScale)
 	# images, exp_times = readfromfile('HDR_data/', 'HDR_data/input.txt', 0.15 )
 
 	# Remove blue backgrounds
@@ -46,9 +64,12 @@ if __name__ == '__main__':
 	#                 images[c][i][j] = [0,  0,  0]
 	#                 print('hi', end='\r')
 
-	#recovery = RobertsonHDR()
-	recovery = PaulDebevecHDR()
-	recover_hdr = recovery.AssembleHDR(images, exp_times)
+	if algo == 'Robertson' :
+		recovery = RobertsonHDR('pic/')
+		recover_hdr = recovery.process(images, exp_times)
+	else :
+		recovery = PaulDebevecHDR()
+		recover_hdr = recovery.AssembleHDR(images, exp_times)
 
 	"""
 	E = recover_hdr
@@ -76,9 +97,13 @@ if __name__ == '__main__':
 	            hdr[i,j,c] = u/b
 	    print('finish channel', c)
 	"""
-
+	if algo == "Robertson":
+		s = "Robertson"
+	else :
+		s = "PaulDebevec"
+		
 	E = recover_hdr
-	cv2.imwrite("PaulDebevec_myhdr_full.hdr", E[...,[2,1,0]]) 
+	cv2.imwrite(s+"_myhdr_full.hdr", E[...,[2,1,0]]) 
 	ldrDrago = tonemapping(E, 0.5, 1.0) 
 	t = np.clip(ldrDrago*255, 0, 255).astype('uint8')
-	cv2.imwrite("PaulDebevec_mytonemap_full.jpg", t[...,[2,1,0]] )
+	cv2.imwrite(s+"_mytonemap_full.jpg", t[...,[2,1,0]] )
